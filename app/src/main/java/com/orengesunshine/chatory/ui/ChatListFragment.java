@@ -68,7 +68,6 @@ public class ChatListFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -109,7 +108,6 @@ public class ChatListFragment extends Fragment implements LoaderManager.LoaderCa
                 return true;
             }
         });
-
         return view;
     }
 

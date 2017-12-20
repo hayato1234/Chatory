@@ -46,6 +46,7 @@ public class LoadTextFileActivity extends AppCompatActivity {
     private static final int NAME_START_POS = 19;
     private static final int DATE_START_POS = 10;
     public static final String INVITATION = "invitation";
+    public static final String DATE = "date";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -228,14 +229,20 @@ public class LoadTextFileActivity extends AppCompatActivity {
                 continue;
             }else if (line.length()==0){
                 continue; //skip empty line between lines
-                //this could be either btwn chats or user input
+                //this could be either btwn chats or user input or at the end of file
+
             }
 
             if (isDate(line)){ //meaning new date
                 chatDate = line; //save date for same day chat
-                if(chat!=null){ //chat is null only on chat line
+                if(chat!=null){ //chat is null only the first date line
                     chat.setText(sb.toString());
+                    chats.add(chat);
                 }
+                chat = new Chat();
+                sb = new StringBuilder();
+                chat.setName(DATE);
+                chat.setDate(chatDate);
             }else {
                 String[] chatLine = line.split("\t");
 
@@ -265,6 +272,12 @@ public class LoadTextFileActivity extends AppCompatActivity {
                     }
                 }
             }
+        }
+
+        //save last chat which is not saved in the while loop
+        if (chat!=null){
+            chat.setText(sb.toString());
+            chats.add(chat);
         }
 
         boolean isSaved = saveChats(chats,roomId);

@@ -32,9 +32,9 @@ public class MainActivity extends AppCompatActivity implements ChatListFragment.
         Log.d(TAG, "onCreate: "+ PrefUtil.getString(LoadTextFileActivity.APP_USER_NAME));
         Log.d(TAG, "onCreate: "+ PrefUtil.getBoolean("user_name_set"));
 
+        mFragmentManager = getSupportFragmentManager();
         if (savedInstanceState==null){
             ChatListFragment chatListFragment = ChatListFragment.newInstance(0);
-            mFragmentManager = getSupportFragmentManager();
             mFragmentManager.beginTransaction()
                     .add(R.id.main_fragment_container,chatListFragment)
                     .commit();
