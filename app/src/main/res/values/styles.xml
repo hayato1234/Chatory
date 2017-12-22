@@ -25,4 +25,11 @@
         <item name="android:layout_marginRight">8dp</item>
     </style>
 
+    <style name="ChatTimeStyle">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@android:color/darker_gray</item>
+        <item name="android:layout_alignParentBottom">true</item>
+    </style>
+
+
 </resources>

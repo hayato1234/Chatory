@@ -1,14 +1,24 @@
 package com.orengesunshine.chatory.ui;
 
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.ListViewCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import com.orengesunshine.chatory.R;
+import com.orengesunshine.chatory.data.ChatContract;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,8 +28,9 @@ import com.orengesunshine.chatory.R;
  * Use the {@link ChatRoomFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChatRoomFragment extends Fragment {
+public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String ARG_ROOM_ID = "arg_room_id";
+    private static final int ROOM_LOADER = 1;
 
     private long roomId;
 
@@ -53,11 +64,22 @@ public class ChatRoomFragment extends Fragment {
         }
     }
 
+    @BindView(R.id.room_list_view)
+    ListView mListView;
+
+    private ChatRoomAdapter mAdapter;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_chat_room, container, false);
+        View view = inflater.inflate(R.layout.fragment_chat_room, container, false);
+        ButterKnife.bind(this,view);
+        mAdapter = new ChatRoomAdapter(getContext(),null);
+        //todo: set an empty view for the list view
+        mListView.setAdapter(mAdapter);
+        getLoaderManager().initLoader(ROOM_LOADER,null,this);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -84,6 +106,37 @@ public class ChatRoomFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        if (id==ROOM_LOADER){
+            String[] projection = {ChatContract.ChatEntry._ID,
+                    ChatContract.ChatEntry.NAME,
+                    ChatContract.ChatEntry.CREATED_AT_DATE,
+                    ChatContract.ChatEntry.CREATED_AT_TIME,
+                    ChatContract.ChatEntry.MESSAGE
+            };
+            String selection = ChatContract.ChatEntry.CHAT_ROOM_ID+"=?";
+            String[] selectionArg = {String.valueOf(roomId)};
+            return new CursorLoader(getContext(),
+                    ChatContract.ChatEntry.CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArg,
+                    null
+                    );
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
+    }
 
 
     /**
