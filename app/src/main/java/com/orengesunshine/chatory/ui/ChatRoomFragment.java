@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.orengesunshine.chatory.R;
 import com.orengesunshine.chatory.data.ChatContract;
@@ -47,7 +48,6 @@ public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCa
      * @param id Parameter 1.
      * @return A new instance of fragment ChatRoomFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static ChatRoomFragment newInstance(long id) {
         ChatRoomFragment fragment = new ChatRoomFragment();
         Bundle args = new Bundle();
@@ -75,6 +75,9 @@ public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCa
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat_room, container, false);
         ButterKnife.bind(this,view);
+//        TextView empty = new TextView(getContext());
+//        empty.setHeight(30);
+//        mListView.addFooterView(empty);
         mAdapter = new ChatRoomAdapter(getContext(),null);
         //todo: set an empty view for the list view
         mListView.setAdapter(mAdapter);

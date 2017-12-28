@@ -5,4 +5,12 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="change_my_name">Change my name</string>
+    <string name="type_in_here">type in here..</string>
+    <string name="done">Done</string>
+    <string name="current_name">Current name:</string>
+    <string name="unknown">unknown</string>
+    <string name="user_name_warning">*the name has to exactly match your user name (case-sensitive) to show correct orientation (your message on right side, others on left side)</string>
+    <string name="saved">saved</string>
+    <string name="saving_chat_history_with">Saving chat history with</string>
 </resources>

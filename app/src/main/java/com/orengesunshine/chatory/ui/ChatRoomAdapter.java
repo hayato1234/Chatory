@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.orengesunshine.chatory.R;
 import com.orengesunshine.chatory.data.ChatContract;
 import com.orengesunshine.chatory.util.LoadTextFileActivity;
+import com.orengesunshine.chatory.util.LoadTextFileService;
 import com.orengesunshine.chatory.util.PrefUtil;
 
 import butterknife.BindView;
@@ -103,7 +104,6 @@ public class ChatRoomAdapter extends CursorAdapter {
             // this is date only entry
             int timeIndex = cursor.getColumnIndex(ChatContract.ChatEntry.CREATED_AT_DATE);
             String time = cursor.getString(timeIndex);
-            Log.d(TAG, "setUpTimeOrInvite: "+time);
             holderDateOrInvite.message.setText(time);
         }else {
             // this is invite only entry
@@ -126,11 +126,11 @@ public class ChatRoomAdapter extends CursorAdapter {
         int nameIndex = cursor.getColumnIndex(ChatContract.ChatEntry.NAME);
         String name = cursor.getString(nameIndex);
 
-        if (name.equals(PrefUtil.getString(LoadTextFileActivity.APP_USER_NAME))){
+        if (name.equals(PrefUtil.getString(LoadTextFileService.APP_USER_NAME))){
             return 1;
-        }else if (name.equals(LoadTextFileActivity.INVITATION)){
+        }else if (name.equals(LoadTextFileService.INVITATION)){
             return 2;
-        }else if (name.equals(LoadTextFileActivity.DATE)){
+        }else if (name.equals(LoadTextFileService.DATE)){
             return 2;
         }else {
             return 0;

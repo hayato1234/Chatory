@@ -46,7 +46,13 @@ public class ChatListAdapter extends CursorAdapter {
             String name = cursor.getString(nameIndex);
             //this is saved time, record last message time
             String time = cursor.getString(timeIndex);
-            String onlyMMdd = time.substring(5,10);
+            String onlyMMdd;
+            if (time!=null){
+                // when new chat is loading, time is null
+                onlyMMdd = time.substring(5,10);
+            }else {
+                onlyMMdd = "loading..";
+            }
             String message = cursor.getString(messageIndex);
             holder.name.setText(name);
             holder.time.setText(onlyMMdd);
