@@ -70,6 +70,7 @@ public class ChatListFragment extends Fragment implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+
         }
     }
 
@@ -84,13 +85,16 @@ public class ChatListFragment extends Fragment implements LoaderManager.LoaderCa
         View view = inflater.inflate(R.layout.fragment_chat_list, container, false);
         ButterKnife.bind(this,view);
         getLoaderManager().initLoader(CHAT_ROOM_LOADER,null,this);
-
+        getActivity().setTitle(getResources().getString(R.string.app_name));
         adapter = new ChatListAdapter(getContext(),null);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long id) {
-                mListener.onListFragmentInteraction(id);
+                cursor.moveToPosition(i);
+                int nameIndex = cursor.getColumnIndex(ChatContract.ChatRoomEntry.PARTICIPANTS_NAME);
+                String chatName = cursor.getString(nameIndex);
+                mListener.onListFragmentInteraction(id,chatName);
             }
         });
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -171,6 +175,6 @@ public class ChatListFragment extends Fragment implements LoaderManager.LoaderCa
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(long id);
+        void onListFragmentInteraction(long id,String roomName);
     }
 }

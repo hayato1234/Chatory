@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -65,21 +66,12 @@ public class LoadTextFileActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             //permission is not granted
 
-            ActivityCompat.requestPermissions(LoadTextFileActivity.this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                ActivityCompat.requestPermissions(LoadTextFileActivity.this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            }
 
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(LoadTextFileActivity.this,
-//                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
-//
-//                // Show an expanation to the user *asynchronously* -- don't block
-//                // this thread waiting for the user's response! After the user
-//                // sees the explanation, try again to request the permission.
-//
-//            } else {
-//
-//
-//            }
         } else {
             //permission is granted
             @SuppressWarnings("unchecked")

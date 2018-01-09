@@ -7,13 +7,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.bassaer.chatmessageview.model.Message;
+import com.github.bassaer.chatmessageview.view.MessageView;
 import com.orengesunshine.chatory.R;
 import com.orengesunshine.chatory.data.ChatContract;
+import com.orengesunshine.chatory.util.CircleTransform;
 import com.orengesunshine.chatory.util.LoadTextFileActivity;
 import com.orengesunshine.chatory.util.LoadTextFileService;
 import com.orengesunshine.chatory.util.PrefUtil;
+import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,8 +27,11 @@ import butterknife.ButterKnife;
 
 public class ChatRoomAdapter extends CursorAdapter {
     private static final String TAG = ChatRoomAdapter.class.getSimpleName();
+    private OnRoomItemClickListener mListener;
+    private Context context;
     public ChatRoomAdapter(Context context, Cursor c) {
         super(context, c,0);
+        this.context = context;
     }
 
     @Override
@@ -75,13 +84,32 @@ public class ChatRoomAdapter extends CursorAdapter {
         int messageIndex = cursor.getColumnIndex(ChatContract.ChatEntry.MESSAGE);
         int timeIndex = cursor.getColumnIndex(ChatContract.ChatEntry.CREATED_AT_TIME);
 
-        String name = cursor.getString(nameIndex);
+        final String name = cursor.getString(nameIndex);
         String message = cursor.getString(messageIndex);
         String time = cursor.getString(timeIndex);
 
         holderOther.name.setText(name);
         holderOther.message.setText(message);
         holderOther.message_time.setText(time);
+        if (PrefUtil.getIconUri(name)!=null){
+            Picasso.with(context).load(PrefUtil.getIconUri(name)).transform(new CircleTransform()).into(holderOther.icon);
+//            Log.d(TAG, "setUpOther: "+PrefUtil.getIconUri(name));
+        }
+        holderOther.icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onRoomItemClicked(name);
+            }
+        });
+    }
+
+    interface OnRoomItemClickListener{
+        //todo: needs to handle users with same name
+        void onRoomItemClicked(String userName);
+    }
+
+    void setOnRoomItemClickListener(OnRoomItemClickListener listener){
+        mListener = listener;
     }
 
     private void setUpMe(View view, Cursor cursor){
@@ -91,7 +119,6 @@ public class ChatRoomAdapter extends CursorAdapter {
 
         String message = cursor.getString(messageIndex);
         String time = cursor.getString(timeIndex);
-
         holderMe.message.setText(message);
         holderMe.message_time.setText(time);
     }
@@ -159,6 +186,8 @@ public class ChatRoomAdapter extends CursorAdapter {
         TextView message;
         @BindView(R.id.room_list_item_name)
         TextView name;
+        @BindView(R.id.room_list_item_icon)
+        ImageView icon;
 
         public ViewHolderOther(View view) {
             ButterKnife.bind(this,view);

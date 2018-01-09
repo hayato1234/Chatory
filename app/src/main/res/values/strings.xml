@@ -13,4 +13,6 @@
     <string name="user_name_warning">*the name has to exactly match your user name (case-sensitive) to show correct orientation (your message on right side, others on left side)</string>
     <string name="saved">saved</string>
     <string name="saving_chat_history_with">Saving chat history with</string>
+    <string name="finished">finished</string>
+    <string name="finish_saving">saved chat history with</string>
 </resources>

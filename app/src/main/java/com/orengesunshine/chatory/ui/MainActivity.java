@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity implements ChatListFragment.
     }
 
     @Override
-    public void onListFragmentInteraction(long id) {
-        ChatRoomFragment chatRoomFragment =ChatRoomFragment.newInstance(id);
+    public void onListFragmentInteraction(long id,String roomName) {
+        ChatRoomFragment chatRoomFragment =ChatRoomFragment.newInstance(id,roomName);
         mFragmentManager.beginTransaction()
                 .replace(R.id.main_fragment_container,chatRoomFragment)
                 .addToBackStack(null)

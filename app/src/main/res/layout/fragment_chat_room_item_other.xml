@@ -41,9 +41,11 @@
             android:layout_width="wrap_content"
             android:maxWidth="250dp"
             android:layout_height="wrap_content"
+            android:padding="5dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
+            android:background="@drawable/other_layout"
             android:text="message sorehasoreha nagai message ji deshita demo shitoya gi sann ha tambete shimaismashita" />
 
         <TextView

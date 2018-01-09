@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.orengesunshine.chatory">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    
+    <uses-sdk tools:overrideLibrary="com.github.bassaer.chatmessageview"/>
 
     <application
-        android:allowBackup="false"
+        android:allowBackup="true"
+        android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -16,35 +20,22 @@
         <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".util.LoadTextFileActivity"
-            android:label="@string/title_activity_load_text_file"
+            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
-
-            <!-- filter for sending text; accepts SENDTO action with sms URI schemes -->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.SENDTO" />-->
-
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-
-                <!--<data android:mimeType="text/plain" />-->
-            <!--</intent-filter>-->
-            <!-- filter for sending text or images; accepts SEND action and text or image data -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
-                <!--<action-->
-                    <!--android:name="android.intent.action.PICK"/>-->
-                <!--<category-->
-                    <!--android:name="android.intent.category.OPENABLE"/>-->
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/*" />
             </intent-filter>
         </activity>
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/> <!-- optional (needed if default theme has no action bar) -->
         <activity
             android:name=".ui.SendActivity"
             android:label="@string/title_activity_send"

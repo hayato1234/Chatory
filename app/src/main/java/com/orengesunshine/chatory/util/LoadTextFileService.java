@@ -59,6 +59,7 @@ public class LoadTextFileService extends IntentService {
     public static final String NOTIFICATION_CHANNEL_ID_SAVING = "notification_channel_saving";
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotificationManager;
+    private String onlyNames;
 
     public LoadTextFileService() {
         super(TAG);
@@ -97,17 +98,18 @@ public class LoadTextFileService extends IntentService {
                 Log.d(TAG, "onHandleIntent: "+path);
                 loadTextFile(path);
                 Log.d(TAG, "onHandleIntent: saving done");
+                mNotificationManager.cancel(mLoadingId);
                 mBuilder.setProgress(0,0,false)
-                        .setContentText(getString(R.string.saved));
+                        .setContentTitle(getString(R.string.finish_saving)+" "+onlyNames)
+                        .setContentText(getString(R.string.finished));
                 mNotificationManager.notify(mLoadingId,mBuilder.build());
 
                 mLoadingId++;
             }else Log.d(TAG, "onHandleIntent: uri is null");
         }else Log.d(TAG, "onHandleIntent: intent is null");
-
     }
 
-    private void loadTextFile(String path){
+    private void loadTextFile(String path) {
         BufferedReader readerForCount = null;
         try {
 
@@ -119,6 +121,7 @@ public class LoadTextFileService extends IntentService {
             BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
             makeChatRoom(reader);
         } catch (FileNotFoundException e) {
+            mNotificationManager.cancel(mLoadingId);
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -140,7 +143,7 @@ public class LoadTextFileService extends IntentService {
             //get all user(s) in the chat
             String chatWithNames = reader.readLine();
             Log.d(TAG, "makeChatRoom: "+chatWithNames);
-            String onlyNames = chatWithNames.substring(NAME_START_POS);
+            onlyNames = chatWithNames.substring(NAME_START_POS);
             mBuilder.setContentTitle(getString(R.string.saving_chat_history_with)+" "+onlyNames);
             mNotificationManager.notify(mLoadingId,mBuilder.build());
             String[] names = onlyNames.split(",");
@@ -206,8 +209,6 @@ public class LoadTextFileService extends IntentService {
         }
 
         Log.d(TAG, "saveAppUserName: "+PrefUtil.getBoolean(IS_USER_NAME_SET)+" , "+PrefUtil.getString(APP_USER_NAME));
-
-
     }
 
     private boolean isRoomExist(String participants){
@@ -374,16 +375,6 @@ public class LoadTextFileService extends IntentService {
 
             return false;
         }
-    }
-
-    private void makeToast(final String message){
-        //todo: IllegalStateException?
-//        new Handler().post(new Runnable() {
-//            @Override
-//            public void run() {
-//                Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
-//            }
-//        });
     }
 
     public void registerLocationNotifChnnl() {
