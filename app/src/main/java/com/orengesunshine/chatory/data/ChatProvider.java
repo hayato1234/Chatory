@@ -10,8 +10,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
+
 import com.orengesunshine.chatory.data.ChatContract.ChatEntry;
 import com.orengesunshine.chatory.data.ChatContract.ChatRoomEntry;
+import com.orengesunshine.chatory.model.Chat;
 import com.orengesunshine.chatory.model.ChatRoom;
 
 
@@ -181,7 +184,7 @@ public class ChatProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         switch (match){
             case CHAT_TABLE:
-
+                return  updateChatEntry(uri,contentValues,selection,selectionArgs);
             case CHAT_TABLE_ID:
 
             case CHAT_ROOM_TABLE:
@@ -201,6 +204,19 @@ public class ChatProvider extends ContentProvider {
 
         SQLiteDatabase db = mChatDbHelper.getWritableDatabase();
         int rowsAffected = db.update(ChatRoomEntry.TABLE_NAME,contentValues,s,strings);
+        if (rowsAffected!=0&&(getContext()!=null)){
+            getContext().getContentResolver().notifyChange(uri,null);
+        }
+        return rowsAffected;
+    }
+    
+    public int updateChatEntry(Uri uri,ContentValues contentValues,String selection,String[] args){
+        if (contentValues.size()==0){
+            Log.d(TAG, "updateChatEntry: empty content");
+            return 0;
+        }
+        SQLiteDatabase db = mChatDbHelper.getWritableDatabase();
+        int rowsAffected = db.update(ChatEntry.TABLE_NAME,contentValues,selection,args);
         if (rowsAffected!=0&&(getContext()!=null)){
             getContext().getContentResolver().notifyChange(uri,null);
         }

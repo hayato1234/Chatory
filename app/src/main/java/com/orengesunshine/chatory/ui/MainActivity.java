@@ -31,7 +31,8 @@ import butterknife.ButterKnife;
 
 
 
-public class MainActivity extends AppCompatActivity implements ChatListFragment.OnListFragmentInteractionListener,ChatRoomFragment.OnFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements ChatListFragment.OnListFragmentInteractionListener,
+        ChatRoomFragment.OnFragmentInteractionListener{
 
     private static final String TAG = MainActivity.class.getSimpleName();
     FragmentManager mFragmentManager;
@@ -40,11 +41,6 @@ public class MainActivity extends AppCompatActivity implements ChatListFragment.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        Log.d(TAG, "onCreate: "+ PrefUtil.getString(LoadTextFileService.APP_USER_NAME));
-
-
-
         mFragmentManager = getSupportFragmentManager();
         if (savedInstanceState==null){
             ChatListFragment chatListFragment = ChatListFragment.newInstance(0);
@@ -80,11 +76,7 @@ public class MainActivity extends AppCompatActivity implements ChatListFragment.
         int id = item.getItemId();
         switch (id){
             case R.id.menu_change_name:
-                ChangeNameFragment changeNameFragment = new ChangeNameFragment();
-                mFragmentManager.beginTransaction()
-                        .replace(R.id.main_fragment_container,changeNameFragment)
-                        .addToBackStack(null)
-                        .commit();
+                startActivity(new Intent(this,ChangeNameActivity.class));
                 return true;
             case R.id.test:
                 NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -98,11 +90,6 @@ public class MainActivity extends AppCompatActivity implements ChatListFragment.
                         .setSmallIcon(R.drawable.ic_notification_saving)
                         .setContentTitle("hello")
                         .setContentText("notification");
-//                PendingIntent intent = PendingIntent.getActivity(getApplicationContext(),0,
-//                        new Intent(getApplicationContext(),MainActivity.class),0
-//                );
-//
-//                builder.setContentIntent(intent);
                 manager.notify(3938752,builder.build());
             default:
                 return super.onOptionsItemSelected(item);

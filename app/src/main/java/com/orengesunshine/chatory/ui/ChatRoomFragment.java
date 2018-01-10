@@ -3,6 +3,8 @@ package com.orengesunshine.chatory.ui;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
@@ -52,7 +54,7 @@ import static android.app.Activity.RESULT_OK;
  * create an instance of this fragment.
  */
 public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, ChatRoomAdapter.OnRoomItemClickListener {
-    private static final String TAG = ChangeNameFragment.class.getSimpleName();
+    private static final String TAG = ChatRoomFragment.class.getSimpleName();
     private static final String ARG_ROOM_ID = "arg_room_id";
     private static final String ARG_ROOM_NAME = "arg_room_name";
     private static final String CLICKED_USER = "clicked_user";
@@ -179,14 +181,41 @@ public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onRoomItemClicked(String userName) {
+    public void onRoomItemClicked(final String userName) {
         mClickedUserName = userName;
-//        CropImage.startPickImageActivity(getContext(),this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setItems(R.array.user_action_list, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switch (i){
+                    case 0:
+                        changeIcon();
+                        break;
+                    case 1:
+                        changeName();
+                        break;
+                        default: break;
+                }
+            }
+        });
+        builder.create().show();
+
+//
+    }
+
+    private void changeName() {
+        Intent intent = new Intent(getContext(),ChangeNameActivity.class);
+        intent.putExtra(ChangeNameActivity.FRIEND_NAME,mClickedUserName);
+        startActivity(intent);
+    }
+
+    private void changeIcon() {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         startActivityForResult(Intent.createChooser(intent,"Crop an icon"),INTENT_PICKER);
     }
+
     private void startCropImageActivity(Uri imageUri) {
         CropImage.activity(imageUri)
                 .setCropShape(CropImageView.CropShape.OVAL)
@@ -258,6 +287,12 @@ public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
+    /**
+     * copy cache file from crop activity and save to internal file
+     * @param src cached file
+     * @param dst file with new file name
+     * @throws IOException for streams
+     */
     private void copy(File src, File dst) throws IOException {
         FileInputStream inStream = new FileInputStream(src);
         FileOutputStream outStream = new FileOutputStream(dst);

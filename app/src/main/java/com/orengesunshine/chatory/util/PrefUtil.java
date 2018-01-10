@@ -22,6 +22,12 @@ public class PrefUtil {
         return ChatoryApp.getSharedPreferences().getString(key,null);
     }
 
+    public static void deleteString(String key){
+        SharedPreferences.Editor editor = ChatoryApp.getSharedPreferences().edit();
+        editor.remove(key);
+        editor.apply();
+    }
+
     public static void saveBoolean(String key, boolean value){
         SharedPreferences.Editor editor = ChatoryApp.getSharedPreferences().edit();
         editor.putBoolean(key,value);
@@ -36,10 +42,13 @@ public class PrefUtil {
     }
 
     public static void saveIconUri(String name, Uri uri){
-        saveString(ICON_URI+name,uri.toString());
+        if (uri!=null){
+            saveString(ICON_URI+name,uri.toString());
+        }
     }
 
     public static String getIconUri(String name){
-        return getString(ICON_URI+name);
+        return getString(ICON_URI+name,null);
     }
+
 }
