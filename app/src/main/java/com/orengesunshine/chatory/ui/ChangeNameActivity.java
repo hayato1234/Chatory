@@ -26,8 +26,10 @@ public class ChangeNameActivity extends AppCompatActivity {
 
     private static final String TAG = ChangeNameActivity.class.getSimpleName();
     public static final String FRIEND_NAME = "friend_name";
+    public static final String ROOM_NAME = "room_name";
     private String currentName;
     private boolean isFriend;
+    private boolean isRoom;
 
     @BindView(R.id.change_name_current)
     TextView currentTextView;
@@ -42,12 +44,18 @@ public class ChangeNameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_change_name);
         ButterKnife.bind(this);
 
-        if (getIntent().getExtras()==null){ //user
+        Bundle extra = getIntent().getExtras();
+        if (extra==null){ //user
             isFriend = false;
             currentName = PrefUtil.getString(LoadTextFileService.APP_USER_NAME);
         }else {//friend
-            currentName = getIntent().getExtras().getString(FRIEND_NAME);
-            isFriend = true;
+            if (extra.getString(FRIEND_NAME)!=null){
+                currentName = extra.getString(FRIEND_NAME);
+                isFriend = true;
+            } else if (extra.getString(ROOM_NAME)!=null){
+                currentName = extra.getString(ROOM_NAME);
+                isRoom = true;
+            }
             warning.setVisibility(View.GONE);
         }
 
@@ -65,13 +73,15 @@ public class ChangeNameActivity extends AppCompatActivity {
         String newName = input.getText().toString();
         currentTextView.setText(newName);
         if (isFriend){
-            updateDateBase(currentName,newName);
+            updateUserName(currentName,newName);
             updateIconName(currentName,newName);
+        }else if (isRoom){
+            updateRoomName(currentName,newName);
         }else {
             PrefUtil.saveString(LoadTextFileService.APP_USER_NAME,newName);
         }
         currentName = newName;
-//        Toast.makeText(this,"name is changed to "+currentName,Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"name is changed to "+currentName,Toast.LENGTH_SHORT).show();
     }
 
     private void updateIconName(String oldName, String newName){
@@ -80,7 +90,7 @@ public class ChangeNameActivity extends AppCompatActivity {
         PrefUtil.deleteString(oldName);
     }
 
-    private void updateDateBase(String oldName, String newName){
+    private void updateUserName(String oldName, String newName){
         ContentResolver cv = getContentResolver();
         Uri uri = ChatContract.ChatEntry.CONTENT_URI;
         ContentValues contentValues = new ContentValues();
@@ -88,5 +98,18 @@ public class ChangeNameActivity extends AppCompatActivity {
         String where = ChatContract.ChatEntry.NAME +"=?";
         String[] args = new String[]{oldName};
         cv.update(uri,contentValues,where,args);
+    }
+
+    private void updateRoomName(String oldTitle,String newTitle){
+        ContentResolver resolver = getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(ChatContract.ChatRoomEntry.PARTICIPANTS_NAME,newTitle);
+        String selection = ChatContract.ChatRoomEntry.PARTICIPANTS_NAME+"=?";
+        String[] args = new String[]{oldTitle};
+        resolver.update(ChatContract.ChatRoomEntry.CONTENT_URI,
+                values,
+                selection,
+                args
+                );
     }
 }

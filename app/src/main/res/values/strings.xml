@@ -15,4 +15,6 @@
     <string name="saving_chat_history_with">Saving chat history with</string>
     <string name="finished">finished</string>
     <string name="finish_saving">saved chat history with</string>
+    <string name="change_title">change title</string>
+    <string name="menu_option_change_room_name">change title</string>
 </resources>

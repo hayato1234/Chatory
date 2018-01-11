@@ -19,6 +19,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.ListViewCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -92,6 +95,7 @@ public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getContext();
+        setHasOptionsMenu(true);
         if (getArguments() != null) {
             roomId = getArguments().getLong(ARG_ROOM_ID);
             roomTitle = getArguments().getString(ARG_ROOM_NAME);
@@ -310,6 +314,23 @@ public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCa
             outState.putString(CLICKED_USER,mClickedUserName);
         }
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.add(R.string.menu_option_change_room_name).setIcon(R.drawable.ic_edit).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        CharSequence id = item.getTitle();
+        if (id.equals(getResources().getString(R.string.menu_option_change_room_name))){
+            Intent intent = new Intent(context,ChangeNameActivity.class);
+            intent.putExtra(ChangeNameActivity.ROOM_NAME,roomTitle);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
