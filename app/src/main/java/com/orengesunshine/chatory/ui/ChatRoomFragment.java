@@ -76,7 +76,7 @@ public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCa
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param id Parameter 1.
+     * @param id is room id
      * @return A new instance of fragment ChatRoomFragment.
      */
     public static ChatRoomFragment newInstance(long id,String roomTitle) {
