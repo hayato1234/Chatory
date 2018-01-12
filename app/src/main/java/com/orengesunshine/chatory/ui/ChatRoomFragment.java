@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -120,6 +122,21 @@ public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCa
         mAdapter.setOnRoomItemClickListener(this);
         //todo: set an empty view for the list view
         mListView.setAdapter(mAdapter);
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, final long l) {
+                new AlertDialog.Builder(getContext())
+                        .setTitle("delete?")
+                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Uri uri = ContentUris.withAppendedId(ChatContract.ChatEntry.CONTENT_URI,l);
+                                getContext().getContentResolver().delete(uri,null,null);
+                            }
+                        }).show();
+                return true;
+            }
+        });
         getLoaderManager().initLoader(ROOM_LOADER,null,this);
         return view;
     }

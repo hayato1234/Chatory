@@ -2,11 +2,7 @@ package com.orengesunshine.chatory.ui;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.FragmentManager;
@@ -17,18 +13,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.FrameLayout;
 
 import com.orengesunshine.chatory.R;
-import com.orengesunshine.chatory.util.LoadTextFileActivity;
-import com.orengesunshine.chatory.util.LoadTextFileService;
-import com.orengesunshine.chatory.util.PrefUtil;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
-
 
 
 public class MainActivity extends AppCompatActivity implements ChatListFragment.OnListFragmentInteractionListener,

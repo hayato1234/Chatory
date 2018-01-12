@@ -3,23 +3,18 @@ package com.orengesunshine.chatory.ui;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.bassaer.chatmessageview.model.Message;
-import com.github.bassaer.chatmessageview.view.MessageView;
 import com.orengesunshine.chatory.R;
 import com.orengesunshine.chatory.data.ChatContract;
 import com.orengesunshine.chatory.util.CircleTransform;
-import com.orengesunshine.chatory.util.LoadTextFileActivity;
-import com.orengesunshine.chatory.util.LoadTextFileService;
+import com.orengesunshine.chatory.service.LoadTextFileService;
 import com.orengesunshine.chatory.util.PrefUtil;
 import com.squareup.picasso.Picasso;
-import com.theartofdev.edmodo.cropper.CropImage;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

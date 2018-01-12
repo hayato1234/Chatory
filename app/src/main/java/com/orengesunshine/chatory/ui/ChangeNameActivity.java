@@ -10,12 +10,10 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.orengesunshine.chatory.R;
 import com.orengesunshine.chatory.data.ChatContract;
-import com.orengesunshine.chatory.util.LoadTextFileActivity;
-import com.orengesunshine.chatory.util.LoadTextFileService;
+import com.orengesunshine.chatory.service.LoadTextFileService;
 import com.orengesunshine.chatory.util.PrefUtil;
 
 import butterknife.BindView;

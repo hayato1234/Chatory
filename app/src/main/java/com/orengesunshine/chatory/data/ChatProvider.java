@@ -163,7 +163,10 @@ public class ChatProvider extends ContentProvider {
             case CHAT_TABLE:
 
             case CHAT_TABLE_ID:
-
+                selection = ChatEntry._ID+"=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                getContext().getContentResolver().notifyChange(uri,null);
+                return mChatDbHelper.getWritableDatabase().delete(ChatEntry.TABLE_NAME,selection,selectionArgs);
             case CHAT_ROOM_TABLE:
 
 //                return mChatDbHelper.getWritableDatabase().delete(ChatRoomEntry.TABLE_NAME,s,strings);
