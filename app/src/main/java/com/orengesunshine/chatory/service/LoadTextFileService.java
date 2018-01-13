@@ -1,4 +1,4 @@
-package com.orengesunshine.chatory.util;
+package com.orengesunshine.chatory.service;
 
 import android.app.IntentService;
 import android.app.NotificationChannel;
@@ -6,26 +6,20 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.media.AudioAttributes;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.orengesunshine.chatory.ChatoryApp;
 import com.orengesunshine.chatory.R;
 import com.orengesunshine.chatory.data.ChatContract;
 import com.orengesunshine.chatory.model.Chat;
 import com.orengesunshine.chatory.model.ChatRoom;
 import com.orengesunshine.chatory.ui.MainActivity;
+import com.orengesunshine.chatory.util.DateTimeUtils;
+import com.orengesunshine.chatory.util.PrefUtil;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -40,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.logging.LogRecord;
 
 
 public class LoadTextFileService extends IntentService {
@@ -50,8 +43,8 @@ public class LoadTextFileService extends IntentService {
     private static final String TAG = LoadTextFileService.class.getSimpleName();
     private static final String IS_USER_NAME_SET = "user_name_set";
     public static final String APP_USER_NAME = "app_user_name";
-    private static final int NAME_START_POS = 19;
     private static final int DATE_START_POS = 10;
+    private static final int NAME_START_POS = 19;
     public static final String INVITATION = "invitation";
     public static final String DATE = "date";
     private int mTotalLineCount;
@@ -68,7 +61,7 @@ public class LoadTextFileService extends IntentService {
     @Override
     public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
 
-        Log.d(TAG, "onStartCommand: "+startId);
+//        Log.d(TAG, "onStartCommand: "+startId);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -101,7 +94,8 @@ public class LoadTextFileService extends IntentService {
                 mNotificationManager.cancel(mLoadingId);
                 mBuilder.setProgress(0,0,false)
                         .setContentTitle(getString(R.string.finish_saving)+" "+onlyNames)
-                        .setContentText(getString(R.string.finished));
+                        .setContentText(getString(R.string.finished))
+                        .setAutoCancel(true);
                 mNotificationManager.notify(mLoadingId,mBuilder.build());
 
                 mLoadingId++;
@@ -136,7 +130,7 @@ public class LoadTextFileService extends IntentService {
 
         mBuilder.setProgress(mTotalLineCount,0,false);
 
-        ChatRoom chatRoom = new ChatRoom();
+//        ChatRoom chatRoom = new ChatRoom();
         ArrayList<Chat> chats;
 
         try {
@@ -147,32 +141,29 @@ public class LoadTextFileService extends IntentService {
             mBuilder.setContentTitle(getString(R.string.saving_chat_history_with)+" "+onlyNames);
             mNotificationManager.notify(mLoadingId,mBuilder.build());
             String[] names = onlyNames.split(",");
-            chatRoom.setNames(names);
+//            chatRoom.setNames(names);
 
             //get date
             String savedDate = reader.readLine().substring(DATE_START_POS);
-            chatRoom.setSavedOn(savedDate);
+//            chatRoom.setSavedOn(savedDate);
 
-            if (isRoomExist(onlyNames)){
-                Log.d(TAG, "makeChatRoom: room already exists, not saving");
-            }else {
-                ContentValues values = new ContentValues();
-                values.put(ChatContract.ChatRoomEntry.PARTICIPANTS_NAME,onlyNames);
-                values.put(ChatContract.ChatRoomEntry.CREATED_AT,savedDate);
-                values.put(ChatContract.ChatRoomEntry.UPDATED_AT,savedDate);
-                Uri uri = getContentResolver().insert(ChatContract.ChatRoomEntry.CONTENT_URI,values);
-                if (uri!=null){
-                    long roomId = ContentUris.parseId(uri);
-                    chats = createChats(reader,roomId);
+            ContentValues values = new ContentValues();
+            values.put(ChatContract.ChatRoomEntry.PARTICIPANTS_NAME,onlyNames);
+            values.put(ChatContract.ChatRoomEntry.CREATED_AT,savedDate);
+            values.put(ChatContract.ChatRoomEntry.UPDATED_AT,savedDate);
+            Uri uri = getContentResolver().insert(ChatContract.ChatRoomEntry.CONTENT_URI,values);
+            if (uri!=null){
+                long roomId = ContentUris.parseId(uri);
+                chats = createChats(reader,roomId);
 
-                    if (!PrefUtil.getBoolean(IS_USER_NAME_SET)){
-                        saveAppUserName(names,chats);
-                    }
-                    chatRoom.setChats(chats);
-                }else {
-                    Log.d(TAG, "makeChatRoom: uri is null");
+                if (!PrefUtil.getBoolean(IS_USER_NAME_SET)){
+                    saveAppUserName(names,chats);
                 }
+//                chatRoom.setChats(chats);
+            }else {
+                Log.d(TAG, "makeChatRoom: uri is null");
             }
+
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -211,24 +202,24 @@ public class LoadTextFileService extends IntentService {
         Log.d(TAG, "saveAppUserName: "+PrefUtil.getBoolean(IS_USER_NAME_SET)+" , "+PrefUtil.getString(APP_USER_NAME));
     }
 
-    private boolean isRoomExist(String participants){
-        String projection[] = new String[]{ChatContract.ChatRoomEntry._ID};
-        String selection = ChatContract.ChatRoomEntry.PARTICIPANTS_NAME+"=?";
-        String[] selectionArg = new String[]{participants};
-        Cursor cursor = getContentResolver().query(
-                ChatContract.ChatRoomEntry.CONTENT_URI,
-                projection,
-                selection,
-                selectionArg,
-                null
-        );
-
-        // count is 0 if there is no room with same names
-        if (cursor!=null){
-            return cursor.getCount()!=0;
-        }
-        return false;
-    }
+//    private boolean isRoomExist(String participants){
+//        String projection[] = new String[]{ChatContract.ChatRoomEntry._ID};
+//        String selection = ChatContract.ChatRoomEntry.PARTICIPANTS_NAME+"=?";
+//        String[] selectionArg = new String[]{participants};
+//        Cursor cursor = getContentResolver().query(
+//                ChatContract.ChatRoomEntry.CONTENT_URI,
+//                projection,
+//                selection,
+//                selectionArg,
+//                null
+//        );
+//
+//        // count is 0 if there is no room with same names
+//        if (cursor!=null){
+//            return cursor.getCount()!=0;
+//        }
+//        return false;
+//    }
 
     private ArrayList<Chat> createChats(BufferedReader reader,long roomId) throws IOException{
         ArrayList<Chat> chats = new ArrayList<>();
@@ -254,7 +245,7 @@ public class LoadTextFileService extends IntentService {
 
             }
 
-            if (isDate(line)){ //meaning new date
+            if (DateTimeUtils.isDate(line)){ //meaning new date
                 chatDate = line; //save date for same day chat
                 if(chat!=null){ //chat is null only the first date line
                     chat.setText(sb.toString());
@@ -267,7 +258,7 @@ public class LoadTextFileService extends IntentService {
             }else {
                 String[] chatLine = line.split("\t");
 
-                if (isTime(chatLine[0])&&chatLine.length>1){
+                if (DateTimeUtils.isTime(chatLine[0])&&chatLine.length>1){
                     // text with time, which means new chat and structure is "date name text"
                     if (chat!=null){
                         chat.setText(sb.toString());
@@ -352,30 +343,30 @@ public class LoadTextFileService extends IntentService {
         return count;
     }
 
-    private boolean isDate(String line){
-        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd(EEE)",new Locale("en","US"));
-        format.setLenient(false); //has to match day of week, go wrong with time zone if not set?
-        try {
-            format.parse(line);
-            return true;
-        } catch (ParseException e) {
-            //means it's not a date so return false
+//    private boolean isDate(String line){
+//        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd(EEE)",new Locale("en","US"));
+//        format.setLenient(false); //has to match day of week, go wrong with time zone if not set?
+//        try {
+//            format.parse(line);
+//            return true;
+//        } catch (ParseException e) {
+//            //means it's not a date so return false
+//
+//            return false;
+//        }
+//    }
 
-            return false;
-        }
-    }
-
-    private boolean isTime(String line){
-        SimpleDateFormat format = new SimpleDateFormat("h:mm",new Locale("en","US"));
-        try {
-            format.parse(line);
-            return true;
-        } catch (ParseException e) {
-            //means it's not time so return false
-
-            return false;
-        }
-    }
+//    private boolean isTime(String line){
+//        SimpleDateFormat format = new SimpleDateFormat("h:mm",new Locale("en","US"));
+//        try {
+//            format.parse(line);
+//            return true;
+//        } catch (ParseException e) {
+//            //means it's not time so return false
+//
+//            return false;
+//        }
+//    }
 
     public void registerLocationNotifChnnl() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

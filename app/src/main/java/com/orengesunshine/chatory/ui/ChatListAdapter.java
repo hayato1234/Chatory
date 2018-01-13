@@ -24,6 +24,8 @@ import butterknife.ButterKnife;
 
 public class ChatListAdapter extends CursorAdapter {
 
+    private static final String TAG = ChatListAdapter.class.getSimpleName();
+
     public ChatListAdapter(Context context, Cursor c) {
         super(context, c, 0);
     }

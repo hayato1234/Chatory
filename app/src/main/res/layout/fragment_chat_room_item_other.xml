@@ -47,6 +47,7 @@
             android:layout_alignParentTop="true"
             android:autoLink="all"
             android:background="@drawable/other_layout"
+            android:autoLink="all"
             android:text="message sorehasoreha nagai message ji deshita demo shitoya gi sann ha tambete shimaismashita" />
 
         <TextView
