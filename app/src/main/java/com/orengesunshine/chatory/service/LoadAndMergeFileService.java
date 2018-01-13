@@ -89,7 +89,8 @@ public class LoadAndMergeFileService extends IntentService {
                 mNotificationManager.cancel(mLoadingId);
                 mBuilder.setProgress(0,0,false)
                         .setContentTitle(getString(R.string.finish_saving)+" "+onlyNames)
-                        .setContentText(getString(R.string.finished));
+                        .setContentText(getString(R.string.finished))
+                        .setAutoCancel(true);
                 mNotificationManager.notify(mLoadingId,mBuilder.build());
 
                 mLoadingId++;
@@ -125,7 +126,6 @@ public class LoadAndMergeFileService extends IntentService {
         mBuilder.setProgress(mTotalLineCount,0,false);
 
         ChatRoom chatRoom = new ChatRoom();
-        ArrayList<Chat> chats;
 
         try {
             //get all user(s) in the chat
@@ -142,18 +142,7 @@ public class LoadAndMergeFileService extends IntentService {
             chatRoom.setSavedOn(savedDate);
             updateDBDate(savedDate);
 
-            chats = createChats(reader);
-
-
-
-//            if (uri!=null){
-//                long roomId = ContentUris.parseId(uri);
-//                chats = createChats(reader,roomId);
-//
-//                chatRoom.setChats(chats);
-//            }else {
-//                Log.d(TAG, "makeChatRoom: uri is null");
-//            }
+            createChats(reader);
 
             reader.close();
         } catch (IOException e) {
@@ -169,7 +158,7 @@ public class LoadAndMergeFileService extends IntentService {
         getContentResolver().update(ChatContract.ChatRoomEntry.CONTENT_URI,values,where,args);
     }
 
-    private ArrayList<Chat> createChats(BufferedReader reader) throws IOException{
+    private void createChats(BufferedReader reader) throws IOException{
         ArrayList<Chat> chats = new ArrayList<>();
 
         //get all chats
@@ -253,7 +242,7 @@ public class LoadAndMergeFileService extends IntentService {
         }
 
         mTotalLineCount = currentCount+chats.size();
-        boolean isSaved = saveChats(chats,roomId,currentCount);
+        saveChats(chats,roomId,currentCount);
 
         Chat lastChat = chats.get(chats.size()-1);
         ContentValues values = new ContentValues();
@@ -263,11 +252,10 @@ public class LoadAndMergeFileService extends IntentService {
         int rowsUpdated = getContentResolver().update(uri,values,null,null);
 //        Log.d(TAG, "createChats: update "+rowsUpdated);
 
-        return chats;
     }
 
 
-    private boolean saveChats(List<Chat> chats, long roomId, int currentCount){
+    private void saveChats(List<Chat> chats, long roomId, int currentCount){
         boolean saveSuccess = true;
         Log.d(TAG, "saveChats: estimate: "+mTotalLineCount+" now at: "+currentCount);
         for (Chat c: chats){
@@ -288,8 +276,6 @@ public class LoadAndMergeFileService extends IntentService {
         }
 
         Log.d(TAG, "saveChats: estimate: "+mTotalLineCount+" end at: "+currentCount);
-
-        return saveSuccess;
     }
 
     public void registerLocationNotifChnnl() {

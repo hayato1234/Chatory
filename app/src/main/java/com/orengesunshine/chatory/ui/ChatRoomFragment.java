@@ -285,6 +285,7 @@ public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCa
                 }
                 //todo: save actual value
                 Uri innerUri = Uri.parse("file://"+internalFile.getAbsolutePath());
+                Log.d(TAG, "onActivityResult: "+innerUri.getScheme()+innerUri.getPath()+" , "+innerUri.getEncodedPath());
                 PrefUtil.saveIconUri(mClickedUserName, innerUri);
                 mAdapter.notifyDataSetChanged();
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {

@@ -1,6 +1,7 @@
 package com.orengesunshine.chatory.service;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -20,11 +21,16 @@ import com.orengesunshine.chatory.R;
 import com.orengesunshine.chatory.data.ChatContract;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 // todo: auto link, why checkout master gets everything in branch?????
 // ask user and merge
@@ -58,18 +64,45 @@ public class LoadTextFileActivity extends AppCompatActivity {
 
         } else {
             //permission is granted
-            @SuppressWarnings("unchecked")
-            ArrayList<Uri> uriList = (ArrayList<Uri>) i.getSerializableExtra(Intent.EXTRA_STREAM);
-            if (uriList!=null){
-                boolean shouldAskUser = isRoomExist(uriList.get(0));
-                if (shouldAskUser){
-                    askUser(uriList.get(0));
-                }else {
-                    startLoadingService(uriList.get(0));
+            if (Intent.ACTION_SEND.equals(i.getAction())){
+                String s = (String) i.getSerializableExtra(Intent.EXTRA_TEXT);
+                Uri uri = Uri.parse(writeToFile(s));
+                if (uri!=null){
+                    boolean shouldAskUser = isRoomExist(uri);
+                    if (shouldAskUser){
+                        askUser(uri);
+                    }else {
+                        startLoadingService(uri);
+                    }
+                }
+            } else if (Intent.ACTION_SEND_MULTIPLE.equals(i.getAction())){
+                @SuppressWarnings("unchecked")
+                ArrayList<Uri> uriList = (ArrayList<Uri>) i.getSerializableExtra(Intent.EXTRA_STREAM);
+                if (uriList!=null){
+                    boolean shouldAskUser = isRoomExist(uriList.get(0));
+                    if (shouldAskUser){
+                        askUser(uriList.get(0));
+                    }else {
+                        startLoadingService(uriList.get(0));
+                    }
                 }
             }
-//            onBackPressed();
         }
+    }
+
+    private String writeToFile(String data) {
+        String path = String.valueOf(Calendar.getInstance().getTimeInMillis());
+        File file = new File(this.getFilesDir(),path);
+        try {
+            FileOutputStream fOut = new FileOutputStream(file);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fOut);
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+        return file.getAbsolutePath();
     }
 
     private void startLoadingService(Uri uri){

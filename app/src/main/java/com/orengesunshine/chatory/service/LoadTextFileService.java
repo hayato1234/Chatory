@@ -94,7 +94,8 @@ public class LoadTextFileService extends IntentService {
                 mNotificationManager.cancel(mLoadingId);
                 mBuilder.setProgress(0,0,false)
                         .setContentTitle(getString(R.string.finish_saving)+" "+onlyNames)
-                        .setContentText(getString(R.string.finished));
+                        .setContentText(getString(R.string.finished))
+                        .setAutoCancel(true);
                 mNotificationManager.notify(mLoadingId,mBuilder.build());
 
                 mLoadingId++;
