@@ -41,7 +41,7 @@ public class ChatListFragment extends Fragment implements LoaderManager.LoaderCa
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    private static final int CHAT_ROOM_LOADER = 0;
+    public static final int CHAT_ROOM_LOADER = 0;
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
@@ -88,6 +88,7 @@ public class ChatListFragment extends Fragment implements LoaderManager.LoaderCa
         getActivity().setTitle(getResources().getString(R.string.app_name));
         adapter = new ChatListAdapter(getContext(),null);
         listView.setAdapter(adapter);
+        listView.setEmptyView(view.findViewById(R.id.empty_view));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long id) {
@@ -131,6 +132,8 @@ public class ChatListFragment extends Fragment implements LoaderManager.LoaderCa
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        cursor = null;
+        adapter = null;
     }
 
     @Override

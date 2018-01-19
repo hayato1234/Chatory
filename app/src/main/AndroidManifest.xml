@@ -37,6 +37,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="text/*" />
+                <data android:mimeType="application/x-sqlite3" />
+
             </intent-filter>
         </activity>
         <activity
@@ -51,6 +53,16 @@
             android:name=".data.ChatProvider"
             android:authorities="com.orengesunshine.chatory"
             android:exported="false" />
+
+        <provider
+            android:name=".data.GenericFileProvider"
+            android:authorities="com.orengesunshine.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
 
         <service android:name=".service.LoadTextFileService" />
         <service android:name=".service.LoadAndMergeFileService"/>

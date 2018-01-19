@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.orengesunshine.chatory.R;
 import com.orengesunshine.chatory.data.ChatContract;
@@ -46,6 +47,7 @@ public class ChangeNameActivity extends AppCompatActivity {
         if (extra==null){ //user
             isFriend = false;
             currentName = PrefUtil.getString(LoadTextFileService.APP_USER_NAME);
+
         }else {//friend
             if (extra.getString(FRIEND_NAME)!=null){
                 currentName = extra.getString(FRIEND_NAME);
@@ -56,6 +58,8 @@ public class ChangeNameActivity extends AppCompatActivity {
             }
             warning.setVisibility(View.GONE);
         }
+
+        if (currentName==null) currentName = getString(R.string.not_set);
 
         currentTextView.setText(currentName);
     }

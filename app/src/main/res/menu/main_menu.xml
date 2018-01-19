@@ -3,6 +3,8 @@
     <item android:id="@+id/menu_change_name"
         android:title="@string/change_my_name"
         />
+    <item android:id="@+id/menu_option_export_db"
+        android:title="@string/export_data"/>
     <item android:id="@+id/test"
         android:title="test"/>
 </menu>

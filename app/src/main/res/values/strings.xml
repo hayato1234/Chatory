@@ -17,4 +17,14 @@
     <string name="finish_saving">saved chat history with</string>
     <string name="change_title">change title</string>
     <string name="menu_option_change_room_name">change title</string>
+    <string name="export_data">Export data</string>
+    <string name="delete_all_chats">Delete all chats</string>
+    <string name="import_data">import data</string>
+    <string name="not_set">not set</string>
+    <string name="ask_user_for_combine_action">Same name found in database. Do you want to...</string>
+    <string name="save_as_new">Save as new</string>
+    <string name="canel">Cancel</string>
+    <string name="combine">Combine</string>
+    <string name="warning_require_permission">data can\'t be saved without your permission</string>
+    <string name="file_fail">unable to open this file</string>
 </resources>

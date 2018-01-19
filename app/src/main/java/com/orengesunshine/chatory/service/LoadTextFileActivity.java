@@ -9,8 +9,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,6 +21,9 @@ import android.widget.Toast;
 
 import com.orengesunshine.chatory.R;
 import com.orengesunshine.chatory.data.ChatContract;
+import com.orengesunshine.chatory.data.ChatDbHelper;
+import com.orengesunshine.chatory.ui.MainActivity;
+import com.orengesunshine.chatory.util.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,14 +31,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-// todo: auto link, why checkout master gets everything in branch?????
-// ask user and merge
 
 public class LoadTextFileActivity extends AppCompatActivity {
 
@@ -64,45 +68,75 @@ public class LoadTextFileActivity extends AppCompatActivity {
 
         } else {
             //permission is granted
-            if (Intent.ACTION_SEND.equals(i.getAction())){
-                String s = (String) i.getSerializableExtra(Intent.EXTRA_TEXT);
-                Uri uri = Uri.parse(writeToFile(s));
-                if (uri!=null){
-                    boolean shouldAskUser = isRoomExist(uri);
-                    if (shouldAskUser){
-                        askUser(uri);
-                    }else {
-                        startLoadingService(uri);
-                    }
-                }
-            } else if (Intent.ACTION_SEND_MULTIPLE.equals(i.getAction())){
-                @SuppressWarnings("unchecked")
-                ArrayList<Uri> uriList = (ArrayList<Uri>) i.getSerializableExtra(Intent.EXTRA_STREAM);
-                if (uriList!=null){
-                    boolean shouldAskUser = isRoomExist(uriList.get(0));
-                    if (shouldAskUser){
-                        askUser(uriList.get(0));
-                    }else {
-                        startLoadingService(uriList.get(0));
-                    }
-                }
-            }
+            handleIntent(i);
         }
     }
 
-    private String writeToFile(String data) {
-        String path = String.valueOf(Calendar.getInstance().getTimeInMillis());
-        File file = new File(this.getFilesDir(),path);
+    private void handleIntent(Intent i){
+        String mimeType = i.getType();
+        if (mimeType==null) {
+            Log.d(TAG, "onCreate: mimeType is null "+i.getData());
+            //import from option
+            if (i.getData()!=null){
+                //mimeType = null and data means it's from menu option import
+                importDatabase(i.getData());
+            }
+            return;
+        }
+        // shared text file
+        if (mimeType.equals("text/plain")){
+            Uri uri = null;
+            if (Intent.ACTION_SEND.equals(i.getAction())){
+                String s = (String) i.getSerializableExtra(Intent.EXTRA_TEXT);
+                uri = Uri.parse(FileUtils.writeToFile(this,s));
+            } else if (Intent.ACTION_SEND_MULTIPLE.equals(i.getAction())){
+                @SuppressWarnings("unchecked")
+                ArrayList<Uri> uriList = (ArrayList<Uri>) i.getSerializableExtra(Intent.EXTRA_STREAM);
+                uri = uriList.get(0);
+//                if (uriList!=null){
+//                    boolean shouldAskUser = isRoomExist(uriList.get(0));
+//                    if (shouldAskUser){
+//                        askUser(uriList.get(0));
+//                    }else {
+//                        startLoadingService(uriList.get(0));
+//                    }
+//                }
+            }
+
+            if (uri!=null){
+                boolean shouldAskUser = isRoomExist(uri);
+                if (shouldAskUser){
+                    askUser(uri);
+                }else {
+                    startLoadingService(uri);
+                }
+            }
+
+        }else if (mimeType.equals("application/x-sqlite3")){ //shared database
+            Uri uri = i.getParcelableExtra(Intent.EXTRA_STREAM);
+            importDatabase(uri);
+
+        } else {
+            Toast.makeText(this, R.string.file_fail,Toast.LENGTH_LONG).show();
+            onBackPressed();
+        }
+    }
+
+    private void importDatabase(Uri uri) {
         try {
-            FileOutputStream fOut = new FileOutputStream(file);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fOut);
-            outputStreamWriter.write(data);
-            outputStreamWriter.close();
+            FileInputStream is = (FileInputStream) getContentResolver().openInputStream(uri);
+            File data  = Environment.getDataDirectory();
+            String  currentDBPath= "//data//" + "com.orengesunshine.chatory"
+                    + "//databases//" + ChatDbHelper.DB_NAME;
+            File  backupDB= new File(data, currentDBPath);
+            FileUtils.copyDb(is,backupDB);
+//            Log.d(TAG, "onCreate: start activity");
+            startActivity(new Intent(this, MainActivity.class));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (ClassCastException cce){
+            Log.d(TAG, "onCreate cast error: "+cce.toString());
         }
-        catch (IOException e) {
-            Log.e("Exception", "File write failed: " + e.toString());
-        }
-        return file.getAbsolutePath();
     }
 
     private void startLoadingService(Uri uri){
@@ -148,23 +182,22 @@ public class LoadTextFileActivity extends AppCompatActivity {
     }
 
     private void askUser(final Uri uri){
-        Log.d(TAG, "askUser: ");
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Same name found in database. Do you want to...")
-                .setNegativeButton("Save as new", new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.ask_user_for_combine_action)
+                .setNegativeButton(getString(R.string.save_as_new), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         startLoadingService(uri);
                     }
                 })
-                .setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+                .setNeutralButton(getString(R.string.canel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
                         onBackPressed();
                     }
                 })
-                .setPositiveButton("Combine", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.combine), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         startCombineService(uri);
@@ -199,12 +232,13 @@ public class LoadTextFileActivity extends AppCompatActivity {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // permission was granted
-                @SuppressWarnings("unchecked")
-                ArrayList<Uri> uriList = (ArrayList<Uri>) i.getSerializableExtra(Intent.EXTRA_STREAM);
-                startLoadingService(uriList.get(0));
+//                @SuppressWarnings("unchecked")
+//                ArrayList<Uri> uriList = (ArrayList<Uri>) i.getSerializableExtra(Intent.EXTRA_STREAM);
+//                startLoadingService(uriList.get(0));
+                handleIntent(i);
             } else {
                 //user denied permission
-                Toast.makeText(this,"data can't be saved without your permission",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.warning_require_permission,Toast.LENGTH_SHORT).show();
             }
 
         }

@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.orengesunshine.chatory.R;
 import com.orengesunshine.chatory.data.ChatContract;
+import com.orengesunshine.chatory.util.FileUtils;
 import com.orengesunshine.chatory.util.PrefUtil;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
@@ -283,7 +284,7 @@ public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCa
                 String internalFilePath = "user_icon_"+mClickedUserName+".jpg";
                 File internalFile = new File(context.getFilesDir(),internalFilePath);
                 try {
-                    copy(cacheFile,internalFile);
+                    FileUtils.copy(cacheFile,internalFile);
                 } catch (IOException e) {
                     Log.d(TAG, "onActivityResult: error, "+e.toString());
                 }
@@ -309,21 +310,21 @@ public class ChatRoomFragment extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
-    /**
-     * copy cache file from crop activity and save to internal file
-     * @param src cached file
-     * @param dst file with new file name
-     * @throws IOException for streams
-     */
-    private void copy(File src, File dst) throws IOException {
-        FileInputStream inStream = new FileInputStream(src);
-        FileOutputStream outStream = new FileOutputStream(dst);
-        FileChannel inChannel = inStream.getChannel();
-        FileChannel outChannel = outStream.getChannel();
-        inChannel.transferTo(0, inChannel.size(), outChannel);
-        inStream.close();
-        outStream.close();
-    }
+//    /**
+//     * copy cache file from crop activity and save to internal file
+//     * @param src cached file
+//     * @param dst file with new file name
+//     * @throws IOException for streams
+//     */
+//    private void copy(File src, File dst) throws IOException {
+//        FileInputStream inStream = new FileInputStream(src);
+//        FileOutputStream outStream = new FileOutputStream(dst);
+//        FileChannel inChannel = inStream.getChannel();
+//        FileChannel outChannel = outStream.getChannel();
+//        inChannel.transferTo(0, inChannel.size(), outChannel);
+//        inStream.close();
+//        outStream.close();
+//    }
 
 
     @Override
